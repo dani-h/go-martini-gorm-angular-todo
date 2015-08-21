@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+
+<head>
+    <meta charset="utf-8">
+    <title>Foo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.js"></script>
+
+    <style>
+        * {
+            border-sizing: border-box;
+        }
+
+        li {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .strike-through {
+            text-decoration: line-through;
+        }
+    </style>
+
+</head>
+
+<body ng-controller="main">
+
+    <ul id="todo-list">
+        <li class="todo" ng-repeat="todo in todos track by $index">
+            <input type="checkbox" ng-model="todo.completed" ng-change="todoCheckboxChange(todo)" ng-checked="todo.completed">
+            <span ng-class="{'strike-through': todo.completed}">{{todo.text}}</span>
+        </li>
+    </ul>
+
+    <input type="text" placeholder="todo text..." ng-model="currentTodoInput" ng-keyup="todoInputKeyup($event)">
+    <button ng-click="todoBtnClick()">Add new todo</button>
+
+    <button ng-click="clearCompleted()">Clear completed</button>
+
+</body>
+
+<script src="/main.js"></script>
+
+</html>
