@@ -106,7 +106,7 @@ func setupMartini() *martini.ClassicMartini {
 				return
 			}
 
-			db.Delete(t)
+			db.Delete(&t)
 			rendr.JSON(http.StatusOK, t)
 		})
 

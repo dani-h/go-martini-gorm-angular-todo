@@ -10,8 +10,8 @@ app.run(["$http", function($http) {
   $http.defaults.headers.patch["Content-Type"] = 'application/x-www-form-urlencoded;charset=utf-8'
 }])
 
-app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike",
-  function($scope, $http, $httpParamSerializerJQLike) {
+app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike", "$q",
+  function($scope, $http, $httpParamSerializerJQLike, $q) {
 
     function NewTodo(text, completed) {
       return {
@@ -40,6 +40,7 @@ app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike",
       if ($event.keyCode === 13) {
         var todo = NewTodo($scope.currentTodoInput, false)
         addTodo(todo)
+        $scope.currentTodoInput = ""
       }
     }
 
@@ -55,7 +56,30 @@ app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike",
     }
 
     $scope.clearCompleted = function() {
-      $scope.todos.forEach(function(todo) {
+      var $promises = $scope.todos
+        .filter(function(todo) {
+          return todo.completed
+        })
+        .map(function(todo) {
+          return $http.delete("/apiv0/todos/" + todo.id)
+        })
+
+      $q.all($promises).then(function(responses) {
+        var todosToRemove = responses.filter(function(response) {
+          return response.status === 200
+        })
+        .map(function(response) {
+          return response.data
+        })
+
+        $scope.todos = $scope.todos.filter(function(todo) {
+          for(var remove of todosToRemove) {
+            if(todo.id === remove.id) {
+              return false
+            }
+          }
+          return true
+        })
 
       })
     }
