@@ -44,7 +44,7 @@ func setupMartini() *martini.ClassicMartini {
 		http.ServeFile(w, r, "index.html")
 	})
 
-	m.Group("/todos", func(router martini.Router) {
+	m.Group("/apiv0/todos", func(router martini.Router) {
 
 		//Get all todos
 		router.Get("/", func(rendr render.Render, db *gorm.DB) {
@@ -55,7 +55,7 @@ func setupMartini() *martini.ClassicMartini {
 		})
 
 		//Get a specific todo based on id
-		router.Get("/:id", func(params martini.Params, rendr render.Render, db *gorm.DB, r *http.Request) {
+		router.Get("/(?P<id>[0-9]+)", func(params martini.Params, rendr render.Render, db *gorm.DB, r *http.Request) {
 			id, err := strconv.Atoi(params["id"])
 			if err != nil {
 				log.Fatalln(err.Error())
@@ -76,6 +76,9 @@ func setupMartini() *martini.ClassicMartini {
 			todoText := r.FormValue("text")
 			completed := r.FormValue("completed")
 
+			log.Println("todoText", todoText)
+			log.Println("completed", completed)
+
 			if len(todoText) == 0 || len(completed) == 0 {
 				rendr.Text(http.StatusBadRequest, "'text' and 'completed' need to be provided")
 				return
@@ -91,7 +94,7 @@ func setupMartini() *martini.ClassicMartini {
 		})
 
 		//Delete todo with id
-		router.Delete("/:id", func(params martini.Params, rendr render.Render, db *gorm.DB) {
+		router.Delete("/(?P<id>[0-9]+)", func(params martini.Params, rendr render.Render, db *gorm.DB) {
 			id, err := strconv.Atoi(params["id"])
 			if err != nil {
 				log.Fatalln(err.Error())
@@ -108,7 +111,7 @@ func setupMartini() *martini.ClassicMartini {
 		})
 
 		//Update todo with id
-		router.Put("/:id", func(r *http.Request, params martini.Params, rendr render.Render, db *gorm.DB) {
+		router.Put("/(?P<id>[0-9]+)", func(r *http.Request, params martini.Params, rendr render.Render, db *gorm.DB) {
 			id, err := strconv.Atoi(params["id"])
 			if err != nil {
 				log.Fatalln(err.Error())
