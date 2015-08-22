@@ -13,6 +13,8 @@ app.run(["$http", function($http) {
 app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike", "$q",
   function($scope, $http, $httpParamSerializerJQLike, $q) {
 
+    const todosUrl = "/apiv0/todos/"
+
     function NewTodo(text, completed) {
       return {
         text: text,
@@ -21,16 +23,15 @@ app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike", "$q",
     }
 
     function addTodo(todo) {
-      var $deferred = $http.post("/apiv0/todos/", $httpParamSerializerJQLike(todo))
+      var $deferred = $http.post(todosUrl, $httpParamSerializerJQLike(todo))
 
       $deferred.then(function(response) {
         $scope.todos.push(response.data)
-        console.log($scope.todos.length)
       })
     }
 
     function setTodoCompletedState(todo) {
-      $http.put("/apiv0/todos/" + todo.id, $httpParamSerializerJQLike(todo))
+      $http.put(todosUrl + todo.id, $httpParamSerializerJQLike(todo))
     }
 
 
@@ -61,7 +62,7 @@ app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike", "$q",
           return todo.completed
         })
         .map(function(todo) {
-          return $http.delete("/apiv0/todos/" + todo.id)
+          return $http.delete(todosUrl + todo.id)
         })
 
       $q.all($promises).then(function(responses) {
@@ -85,7 +86,7 @@ app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike", "$q",
     }
 
     //Initialize all todos
-    $http.get("/apiv0/todos/")
+    $http.get(todosUrl)
       .then(function(response) {
         var todos = response.data
         $scope.todos = todos
