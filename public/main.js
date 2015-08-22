@@ -30,7 +30,7 @@ app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike",
     }
 
     function setTodoCompletedState(todo) {
-      $http.put("/apiv0/todos/", $httpParamSerializerJQLike(todo))
+      $http.put("/apiv0/todos/" + todo.id, $httpParamSerializerJQLike(todo))
     }
 
 
