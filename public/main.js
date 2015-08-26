@@ -1,7 +1,7 @@
 /* global angular */
 var app = angular.module("app", [])
 
-app.run(["$http", function($http) {
+app.run(["$http", ($http) => {
   //Angular doesn't encode shit like JQuery does as it does json encoding by default. I don't know how to deal with this
   //in Go
   $http.defaults.headers.common["Content-Type"] = 'application/x-www-form-urlencoded;charset=utf-8'
@@ -24,20 +24,16 @@ app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike", "$q",
 
     function addTodo(todo) {
       var $deferred = $http.post(todosUrl, $httpParamSerializerJQLike(todo))
-
-      $deferred.then(function(response) {
-        $scope.todos.push(response.data)
-      })
+      $deferred.then((response) => $scope.todos.push(response.data))
     }
 
     function setTodoCompletedState(todo) {
       $http.put(todosUrl + todo.id, $httpParamSerializerJQLike(todo))
     }
 
-
     $scope.currentTodoInput = ""
 
-    $scope.todoInputKeyup = function($event) {
+    $scope.todoInputKeyup = ($event) => {
       if ($event.keyCode === 13) {
         var todo = NewTodo($scope.currentTodoInput, false)
         addTodo(todo)
@@ -45,35 +41,29 @@ app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike", "$q",
       }
     }
 
-    $scope.todoBtnClick = function() {
+    $scope.todoBtnClick = () => {
       if ($scope.currentTodoInput.length > 0) {
         var todo = NewTodo($scope.currentTodoInput, false)
         addTodo(todo)
       }
     }
 
-    $scope.todoCheckboxChange = function(todo) {
+    $scope.todoCheckboxChange = (todo) => {
       setTodoCompletedState(todo)
     }
 
-    $scope.clearCompleted = function() {
+    $scope.clearCompleted = () => {
       var $promises = $scope.todos
-        .filter(function(todo) {
-          return todo.completed
-        })
-        .map(function(todo) {
-          return $http.delete(todosUrl + todo.id)
-        })
+        .filter(todo => todo.completed)
+        .map(todo => $http.delete(todosUrl + todo.id))
 
-      $q.all($promises).then(function(responses) {
-        var todosToRemove = responses.filter(function(response) {
-          return response.status === 200
-        })
-        .map(function(response) {
-          return response.data
-        })
+        $q.all($promises).then(responses => {
 
-        $scope.todos = $scope.todos.filter(function(todo) {
+        var todosToRemove = responses
+        .filter(response => response.status === 200)
+        .map(response => response.data)
+
+        $scope.todos = $scope.todos.filter((todo) => {
           for(var remove of todosToRemove) {
             if(todo.id === remove.id) {
               return false
@@ -87,9 +77,6 @@ app.controller("main", ["$scope", "$http", "$httpParamSerializerJQLike", "$q",
 
     //Initialize all todos
     $http.get(todosUrl)
-      .then(function(response) {
-        var todos = response.data
-        $scope.todos = todos
-      })
+      .then(response => $scope.todos = response.data)
   }
 ])
